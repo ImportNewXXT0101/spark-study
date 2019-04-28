@@ -1,4 +1,4 @@
-package cn.spark.study.core;
+package cn.spark.study.core.operation;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,10 +16,8 @@ import scala.Tuple2;
 
 /**
  * action操作实战
- * @author Administrator
- *
  */
-@SuppressWarnings("unused")
+@SuppressWarnings("all")
 public class ActionOperation {
 	
 	public static void main(String[] args) {
@@ -48,16 +46,7 @@ public class ActionOperation {
 			// 接着将该结果与下一个元素传入call()方法，进行计算，比如3 + 3 = 6
 			// 以此类推
 		// 所以reduce操作的本质，就是聚合，将多个元素聚合成一个元素
-		int sum = numbers.reduce(new Function2<Integer, Integer, Integer>() {
-			
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public Integer call(Integer v1, Integer v2) throws Exception {
-				return v1 + v2;
-			}
-			
-		});
+		int sum = numbers.reduce((v1,v2)->v1 + v2);
 		
 		System.out.println(sum);  
 		
@@ -77,18 +66,7 @@ public class ActionOperation {
 		JavaRDD<Integer> numbers = sc.parallelize(numberList);
 		
 		// 使用map操作将集合中所有数字乘以2
-		JavaRDD<Integer> doubleNumbers = numbers.map(
-				
-				new Function<Integer, Integer>() {
-
-					private static final long serialVersionUID = 1L;
-		
-					@Override
-					public Integer call(Integer v1) throws Exception {
-						return v1 * 2;
-					}
-					
-				});
+		JavaRDD<Integer> doubleNumbers = numbers.map(v->v * 2);
 		
 		// 不用foreach action操作，在远程集群上遍历rdd中的元素
 		// 而使用collect操作，将分布在远程集群上的doubleNumbers RDD的数据拉取到本地
@@ -97,9 +75,7 @@ public class ActionOperation {
 			// 此外，除了性能差，还可能在rdd中数据量特别大的情况下，发生oom异常，内存溢出
 		// 因此，通常，还是推荐使用foreach action操作，来对最终的rdd元素进行处理
 		List<Integer> doubleNumberList = doubleNumbers.collect();
-		for(Integer num : doubleNumberList) {
-			System.out.println(num);  
-		}
+		doubleNumberList.stream().forEach(System.out::println);
 		
 		// 关闭JavaSparkContext
 		sc.close();
@@ -132,9 +108,9 @@ public class ActionOperation {
 		JavaSparkContext sc = new JavaSparkContext(conf);
 		
 		// 有一个集合，里面有1到10,10个数字，现在要对10个数字进行累加
-		List<Integer> numberList = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+		List<Integer> numberList = Arrays.asList(22, 12, 23, 14, 53, 36, 27, 18, 39, 10);
 		JavaRDD<Integer> numbers = sc.parallelize(numberList);
-		
+
 		// 对rdd使用count操作，统计它有多少个元素
 		// take操作，与collect类似，也是从远程集群上，获取rdd的数据
 		// 但是collect是获取rdd的所有数据，take只是获取前n个数据
