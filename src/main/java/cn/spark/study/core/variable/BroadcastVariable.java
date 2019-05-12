@@ -12,8 +12,6 @@ import org.apache.spark.broadcast.Broadcast;
 
 /**
  * 广播变量
- * @author Administrator
- *
  */
 public class BroadcastVariable {
 
@@ -28,33 +26,35 @@ public class BroadcastVariable {
 		final int factor = 3;
 		final Broadcast<Integer> factorBroadcast = sc.broadcast(factor);
 		
-		List<Integer> numberList = Arrays.asList(1, 2, 3, 4, 5);
-		
-		JavaRDD<Integer> numbers = sc.parallelize(numberList);
+		JavaRDD<Integer> numbers = sc.parallelize( Arrays.asList(1, 2, 3, 4, 5));
 		
 		// 让集合中的每个数字，都乘以外部定义的那个factor
+		/**
+		 *   序列号很重要 否则 执行会报错！！！！
+		 */
+//		JavaRDD<Integer> multipleNumbers = numbers.map(v->v*factorBroadcast.value());
 		JavaRDD<Integer> multipleNumbers = numbers.map(new Function<Integer, Integer>() {
 
 			private static final long serialVersionUID = 1L;
-			
+
 			@Override
 			public Integer call(Integer v1) throws Exception {
 				// 使用共享变量时，调用其value()方法，即可获取其内部封装的值
-				int factor = factorBroadcast.value();
-				return v1 * factor;
+				return v1 * factorBroadcast.value();
 			}
-			
+
 		});
-		
+
+//		multipleNumbers.foreach(System.out::println);
 		multipleNumbers.foreach(new VoidFunction<Integer>() {
-			
+
 			private static final long serialVersionUID = 1L;
-			
+
 			@Override
 			public void call(Integer t) throws Exception {
-				System.out.println(t);  
+				System.out.println(t);
 			}
-			
+
 		});
 		
 		sc.close();

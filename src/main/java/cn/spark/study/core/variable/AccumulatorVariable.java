@@ -11,8 +11,6 @@ import org.apache.spark.api.java.function.VoidFunction;
 
 /**
  * 累加变量
- * @author Administrator
- *
  */
 public class AccumulatorVariable {
 
@@ -31,7 +29,7 @@ public class AccumulatorVariable {
 		
 		numbers.foreach(sum::add);
 
-		// 在driver程序中，可以调用Accumulator的value()方法，获取其值
+		//  调用Accumulator的value()方法，获取其值
 		System.out.println(sum.value());  
 		
 		sc.close();
