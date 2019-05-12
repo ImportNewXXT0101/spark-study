@@ -40,7 +40,8 @@ public class WordCountCluster {
 
 		JavaRDD<String> wordList = lines.flatMap(line->Arrays.asList(line.trim().split(",")));
 
-		JavaPairRDD<String, Integer> pairs = wordList.filter(word->!word.isEmpty()).mapToPair(word->new Tuple2<>(word.toLowerCase(), 1));
+		JavaPairRDD<String, Integer> pairs = wordList.filter(word->!word.isEmpty())
+				.mapToPair(word->new Tuple2<>(word.toLowerCase(), 1));
 
 		JavaPairRDD<String, Integer> wordCounts = pairs.reduceByKey(
 				new Function2<Integer, Integer, Integer>() {

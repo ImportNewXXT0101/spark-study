@@ -15,7 +15,6 @@ import scala.Tuple2;
 
 /**
  * 排序的wordcount程序
- * @author Administrator
  *
  */
 public class SortWordCount {
@@ -30,21 +29,9 @@ public class SortWordCount {
 		// 创建lines RDD
 		JavaRDD<String> lines = sc.textFile("C://Users//Administrator//Desktop//spark.txt");
 		
-		// 执行我们之前做过的单词计数
 		JavaRDD<String> words = lines.flatMap(t->Arrays.asList(t.split(" ")));
 
-		JavaPairRDD<String, Integer> pairs = words.mapToPair(
-				
-				new PairFunction<String, String, Integer>() {
-
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public Tuple2<String, Integer> call(String t) throws Exception {
-						return new Tuple2<String, Integer>(t, 1);
-					}
-					
-				});
+		JavaPairRDD<String, Integer> pairs = words.mapToPair(t -> new Tuple2<>(t, 1));
 		
 		JavaPairRDD<String, Integer> wordCounts = pairs.reduceByKey(
 				
@@ -59,10 +46,8 @@ public class SortWordCount {
 					
 				});
 		
-		// 到这里为止，就得到了每个单词出现的次数
-		// 但是，问题是，我们的新需求，是要按照每个单词出现次数的顺序，降序排序
-		// wordCounts RDD内的元素是什么？应该是这种格式的吧：(hello, 3) (you, 2)
-		// 我们需要将RDD转换成(3, hello) (2, you)的这种格式，才能根据单词出现次数进行排序把！
+		//		新需求，是要按照每个单词出现次数的顺序，降序排序
+		//   	需要将RDD转换成(3, hello) (2, you)的这种格式
 		
 		// 进行key-value的反转映射
 		JavaPairRDD<Integer, String> countWords =
@@ -75,8 +60,6 @@ public class SortWordCount {
 		JavaPairRDD<String, Integer> sortedWordCounts =
 				sortedCountWords.mapToPair(t->new Tuple2<>(t._2, t._1));
 				
-		// 到此为止，我们获得了按照单词出现次数排序后的单词计数
-		// 打印出来
 		sortedWordCounts.foreach(new VoidFunction<Tuple2<String,Integer>>() {
 			
 			private static final long serialVersionUID = 1L;
@@ -88,7 +71,6 @@ public class SortWordCount {
 			
 		});
 		
-		// 关闭JavaSparkContext
 		sc.close();
 	}
 	

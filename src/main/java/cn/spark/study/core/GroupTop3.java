@@ -14,8 +14,6 @@ import scala.Tuple2;
 
 /**
  * 分组取top3
- * @author Administrator
- *
  */
 public class GroupTop3 {
 	
@@ -36,8 +34,7 @@ public class GroupTop3 {
 					@Override
 					public Tuple2<String, Integer> call(String line) throws Exception {
 						String[] lineSplited = line.split(" ");  
-						return new Tuple2<String, Integer>(lineSplited[0], 
-								Integer.valueOf(lineSplited[1]));
+						return new Tuple2<>(lineSplited[0], Integer.valueOf(lineSplited[1]));
 					}
 					
 				});
@@ -78,8 +75,7 @@ public class GroupTop3 {
 							}
 						}
 						
-						return new Tuple2<String, 
-								Iterable<Integer>>(className, Arrays.asList(top3));    
+						return new Tuple2<>(className, Arrays.asList(top3));
 					}
 					
 				});
