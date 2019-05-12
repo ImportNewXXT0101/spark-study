@@ -7,8 +7,6 @@ import org.apache.spark.sql.SQLContext;
 
 /**
  * DataFrame的常用操作
- * @author Administrator
- *
  */
 public class DataFrameOperation {
 

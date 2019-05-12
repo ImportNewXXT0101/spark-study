@@ -15,21 +15,30 @@ import org.apache.spark.api.java.function.VoidFunction;
 import scala.Tuple2;
 
 /**
- * action操作实战
+ *     action操作
+ *
+ * 		 1 reduce
+ * 		 2 collect
+ * 		 3 count
+ * 		 4 take
+ * 		 5 saveAsTextFile
+ * 		 6 countByKey
+ *
  */
 @SuppressWarnings("all")
 public class ActionOperation {
 	
 	public static void main(String[] args) {
-		// reduce();
-		// collect();
-		// count();
-		// take();
-		// saveAsTextFile();
-		countByKey();
+//		 reduce();
+//		 collect();
+//		 count();
+//		 take();
+//		 saveAsTextFile();
+		 countByKey();
 	}
 	
 	private static void reduce() {
+
 		// 创建SparkConf和JavaSparkContext
 		SparkConf conf = new SparkConf()
 				.setAppName("reduce")
@@ -40,17 +49,10 @@ public class ActionOperation {
 		List<Integer> numberList = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 		JavaRDD<Integer> numbers = sc.parallelize(numberList);
 		
-		// 使用reduce操作对集合中的数字进行累加
-		// reduce操作的原理：
-			// 首先将第一个和第二个元素，传入call()方法，进行计算，会获取一个结果，比如1 + 2 = 3
-			// 接着将该结果与下一个元素传入call()方法，进行计算，比如3 + 3 = 6
-			// 以此类推
-		// 所以reduce操作的本质，就是聚合，将多个元素聚合成一个元素
 		int sum = numbers.reduce((v1,v2)->v1 + v2);
 		
 		System.out.println(sum);  
 		
-		// 关闭JavaSparkContext
 		sc.close();
 	}
 	
@@ -61,7 +63,6 @@ public class ActionOperation {
 				.setMaster("local");  
 		JavaSparkContext sc = new JavaSparkContext(conf);
 		
-		// 有一个集合，里面有1到10,10个数字，现在要对10个数字进行累加
 		List<Integer> numberList = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 		JavaRDD<Integer> numbers = sc.parallelize(numberList);
 		
@@ -75,6 +76,7 @@ public class ActionOperation {
 			// 此外，除了性能差，还可能在rdd中数据量特别大的情况下，发生oom异常，内存溢出
 		// 因此，通常，还是推荐使用foreach action操作，来对最终的rdd元素进行处理
 		List<Integer> doubleNumberList = doubleNumbers.collect();
+
 		doubleNumberList.stream().forEach(System.out::println);
 		
 		// 关闭JavaSparkContext

@@ -14,100 +14,86 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.VoidFunction;
 
+import org.junit.Test;
 import scala.Tuple2;
 
 import static java.util.stream.Collectors.toList;
 
 /**
- * transformation操作实战
+ * 	transformation操作
  *
+ * 		 1 map
+ * 		 2 filter
+ * 		 3 flatMap
+ * 		 4 groupByKey
+ * 		 5 reduceByKey
+ * 		 6 sortByKey
+ * 		 7 join
+ * 		 8 cogroup
  */
 @SuppressWarnings(value = {"all"})
 public class TransformationOperation {
 
 	private static void prettyPrint(Object object){
-		System.out.println("--->>  "+object);
 		System.out.println("------------------");
+		System.out.println("--->>  "+object);
 	}
 
 	public static void main(String[] args) {
-//		 map();
-		// filter();
-		// flatMap();
-		// groupByKey();
-		// reduceByKey();
-		// sortByKey();
-		// join();
-		cogroup();
+		 map();
+		 filter();
+		 flatMap();
+		 groupByKey();
+		 reduceByKey();
+		 sortByKey();
+		 join();
+		 cogroup();
 	}
-	
+
 	/**
-	 * map算子案例：将集合中每一个元素都乘以2
+	 * map 将集合中每一个元素都乘以2
 	 */
 	private static void map() {
 		// 创建SparkConf
 		SparkConf conf = new SparkConf()
 				.setAppName("map")
 				.setMaster("local");
-		// 创建JavaSparkContext
 		JavaSparkContext sc = new JavaSparkContext(conf);
 	
-		// 构造集合
 		List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
 		
-		// 并行化集合，创建初始RDD
 		JavaRDD<Integer> numberRDD = sc.parallelize(numbers);
 		
-		// 使用map算子，将集合中的每个元素都乘以2
-		// map算子，是对任何类型的RDD，都可以调用的
-		// 在java中，map算子接收的参数是Function对象
-		// 创建的Function对象，一定会让你设置第二个泛型参数，这个泛型类型，就是返回的新元素的类型
-			// 同时call()方法的返回类型，也必须与第二个泛型类型同步
-		// 在call()方法内部，就可以对原始RDD中的每一个元素进行各种处理和计算，并返回一个新的元素
-		// 所有新的元素就会组成一个新的RDD
 		JavaRDD<Integer> multipleNumberRDD = numberRDD.map(v -> v * 2);
 
-		// 打印新的RDD
 		multipleNumberRDD.foreach(number->prettyPrint(number));
 		
-		// 关闭JavaSparkContext
 		sc.close();
 	}
 	
 	/**
-	 * filter算子案例：过滤集合中的偶数
+	 * filter 过滤集合中的偶数
 	 */
 	private static void filter() {
 		// 创建SparkConf
 		SparkConf conf = new SparkConf()
 				.setAppName("filter")
 				.setMaster("local");
-		// 创建JavaSparkContext
 		JavaSparkContext sc = new JavaSparkContext(conf);
 		
-		// 模拟集合
 		List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 		
-		// 并行化集合，创建初始RDD
 		JavaRDD<Integer> numberRDD = sc.parallelize(numbers);
 		
-		// 对初始RDD执行filter算子，过滤出其中的偶数
-		// filter算子，传入的也是Function，其他的使用注意点，实际上和map是一样的
-		// 但是，唯一的不同，就是call()方法的返回类型是Boolean
-		// 每一个初始RDD中的元素，都会传入call()方法，此时你可以执行各种自定义的计算逻辑
-		// 来判断这个元素是否是你想要的
-		// 如果你想在新的RDD中保留这个元素，那么就返回true；否则，不想保留这个元素，返回false
 		JavaRDD<Integer> evenNumberRDD = numberRDD.filter(v -> v % 2 == 0);
 
-		// 打印新的RDD
 		evenNumberRDD.foreach(number->prettyPrint(number));
 		
-		// 关闭JavaSparkContext
 		sc.close();
 	}
 	
 	/**
-	 * flatMap案例：将文本行拆分为多个单词
+	 * flatMap 将文本行拆分为多个单词
 	 */
 	private static void flatMap() {
 		// 创建SparkConf
@@ -117,30 +103,11 @@ public class TransformationOperation {
 		// 创建JavaSparkContext
 		JavaSparkContext sc = new JavaSparkContext(conf);
 		
-		// 构造集合
-		List<String> lineList = Arrays.asList("hello you", "hello me", "hello world");  
+		List<String> lineList = Arrays.asList("hello you", "hello me", "hello world");
 		
-		// 并行化集合，创建RDD
 		JavaRDD<String> lines = sc.parallelize(lineList);
 		
-		// 对RDD执行flatMap算子，将每一行文本，拆分为多个单词
-		// flatMap算子，在java中，接收的参数是FlatMapFunction
-		// 我们需要自己定义FlatMapFunction的第二个泛型类型，即，代表了返回的新元素的类型
-		// call()方法，返回的类型，不是U，而是Iterable<U>，这里的U也与第二个泛型类型相同
-		// flatMap其实就是，接收原始RDD中的每个元素，并进行各种逻辑的计算和处理，返回可以返回多个元素
-		// 多个元素，即封装在Iterable集合中，可以使用ArrayList等集合
-		// 新的RDD中，即封装了所有的新元素；也就是说，新的RDD的大小一定是 >= 原始RDD的大小
-		JavaRDD<String> words = lines.flatMap(new FlatMapFunction<String, String>() {
-
-			private static final long serialVersionUID = 1L;
-
-			// 在这里会，比如，传入第一行，hello you
-			// 返回的是一个Iterable<String>(hello, you)
-			@Override
-			public Iterable<String> call(String t) throws Exception {
-				return Arrays.asList(t.split(" "));
-			}
-		});
+		JavaRDD<String> words = lines.flatMap(t->Arrays.asList(t.split(" ")));
 		// 打印新的RDD
 		words.foreach(new VoidFunction<String>() {
 
@@ -157,7 +124,7 @@ public class TransformationOperation {
 	}
 	
 	/**
-	 * groupByKey案例：按照班级对成绩进行分组
+	 * groupByKey 按照班级对成绩进行分组
 	 */
 	private static void groupByKey() {
 		// 创建SparkConf
@@ -177,11 +144,6 @@ public class TransformationOperation {
 		// 并行化集合，创建JavaPairRDD
 		JavaPairRDD<String, Integer> scores = sc.parallelizePairs(scoreList);
 		
-		// 针对scores RDD，执行groupByKey算子，对每个班级的成绩进行分组
-		// groupByKey算子，返回的还是JavaPairRDD
-		// 但是，JavaPairRDD的第一个泛型类型不变，第二个泛型类型变成Iterable这种集合类型
-		// 也就是说，按照了key进行分组，那么每个key可能都会有多个value，此时多个value聚合成了Iterable
-		// 那么接下来，我们是不是就可以通过groupedScores这种JavaPairRDD，很方便地处理某个分组内的数据
 		JavaPairRDD<String, Iterable<Integer>> groupedScores = scores.groupByKey();
 		
 		// 打印groupedScores RDD
@@ -207,7 +169,7 @@ public class TransformationOperation {
 	}
 	
 	/**
-	 * reduceByKey案例：统计每个班级的总分
+	 * reduceByKey 统计每个班级的总分
 	 */
 	private static void reduceByKey() {
 		// 创建SparkConf
@@ -227,13 +189,6 @@ public class TransformationOperation {
 		// 并行化集合，创建JavaPairRDD
 		JavaPairRDD<String, Integer> scores = sc.parallelizePairs(scoreList);
 		
-		// 针对scores RDD，执行reduceByKey算子
-		// reduceByKey，接收的参数是Function2类型，它有三个泛型参数，实际上代表了三个值
-		// 第一个泛型类型和第二个泛型类型，代表了原始RDD中的元素的value的类型
-			// 因此对每个key进行reduce，都会依次将第一个、第二个value传入，将值再与第三个value传入
-			// 因此此处，会自动定义两个泛型类型，代表call()方法的两个传入参数的类型
-		// 第三个泛型类型，代表了每次reduce操作返回的值的类型，默认也是与原始RDD的value类型相同的
-		// reduceByKey算法返回的RDD，还是JavaPairRDD<key, value>
 		JavaPairRDD<String, Integer> totalScores = scores.reduceByKey(
 				
 				new Function2<Integer, Integer, Integer>() {
@@ -287,11 +242,7 @@ public class TransformationOperation {
 		// 并行化集合，创建RDD
 		JavaPairRDD<Integer, String> scores = sc.parallelizePairs(scoreList);
 		
-		// 对scores RDD执行sortByKey算子
-		// sortByKey其实就是根据key进行排序，可以手动指定升序，或者降序
-		// 返回的，还是JavaPairRDD，其中的元素内容，都是和原始的RDD一模一样的
-		// 但是就是RDD中的元素的顺序，不同了
-		JavaPairRDD<Integer, String> sortedScores = scores.sortByKey(false);  
+		JavaPairRDD<Integer, String> sortedScores = scores.sortByKey(false);
 		
 		// 打印sortedScored RDD
 		sortedScores.foreach(new VoidFunction<Tuple2<Integer,String>>() {
@@ -330,7 +281,6 @@ public class TransformationOperation {
 				new Tuple2<Integer, Integer>(1, 100),
 				new Tuple2<Integer, Integer>(2, 90),
 				new Tuple2<Integer, Integer>(3, 60));
-		
 		// 并行化两个RDD
 		JavaPairRDD<Integer, String> students = sc.parallelizePairs(studentList);
 		JavaPairRDD<Integer, Integer> scores = sc.parallelizePairs(scoreList);
@@ -344,10 +294,23 @@ public class TransformationOperation {
 			// 还有一个(1, 4) (2, 1) (2, 2)的一个RDD
 			// 如果是cogroup的话，会是(1,((1,2,3),(4)))    
 			// join以后，实际上会得到(1 (1, 4)) (1, (2, 4)) (1, (3, 4))	
-		JavaPairRDD<Integer, Tuple2<String, Integer>> studentScores = students.join(scores);
-		
+		JavaPairRDD<Integer, Tuple2<String, Integer>> studentScores1 = students.join(scores);
+		JavaPairRDD<Integer, Tuple2<String, Integer>> studentScores2 = students.join(scores);
+
+		JavaPairRDD<Integer, Tuple2<Tuple2<String, Integer>, Tuple2<String, Integer>>> join
+				= studentScores1.join(studentScores2);
+
+		join.foreach(new VoidFunction<Tuple2<Integer, Tuple2<Tuple2<String, Integer>, Tuple2<String, Integer>>>>() {
+			@Override
+			public void call(Tuple2<Integer, Tuple2<Tuple2<String, Integer>, Tuple2<String, Integer>>> t) throws Exception {
+				System.out.println("+++");
+				System.out.println(t._1 +" "+ t._2.toString());
+				System.out.println("+++");
+			}
+		});
+
 		// 打印studnetScores RDD
-		studentScores.foreach(
+		studentScores1.foreach(
 				
 				new VoidFunction<Tuple2<Integer,Tuple2<String,Integer>>>() {
 
@@ -369,7 +332,7 @@ public class TransformationOperation {
 	}
 	
 	/**
-	 * cogroup案例：打印学生成绩
+	 * cogroup 打印学生成绩
 	 */
 	private static void cogroup() {
 		// 创建SparkConf
@@ -399,8 +362,7 @@ public class TransformationOperation {
 		
 		// cogroup与join不同
 		// 相当于是，一个key join上的所有value，都给放到一个Iterable里面去了 
-		// cogroup，不太好讲解，希望大家通过动手编写我们的案例，仔细体会其中的奥妙
-		JavaPairRDD<Integer, Tuple2<Iterable<String>, Iterable<Integer>>> studentScores = 
+		JavaPairRDD<Integer, Tuple2<Iterable<String>, Iterable<Integer>>> studentScores =
 				students.cogroup(scores);
 		
 		// 打印studnetScores RDD

@@ -13,7 +13,6 @@ import scala.Tuple2;
 
 /**
  * 取最大的前3个数字
- * @author Administrator
  *
  */
 public class Top3 {
@@ -34,7 +33,7 @@ public class Top3 {
 
 					@Override
 					public Tuple2<Integer, String> call(String t) throws Exception {
-						return new Tuple2<Integer, String>(Integer.valueOf(t), t);
+						return new Tuple2<>(Integer.valueOf(t), t);
 					}
 					
 				});
