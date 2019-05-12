@@ -1,4 +1,4 @@
-package cn.spark.study.core;
+package cn.spark.study.core.variable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,18 +29,8 @@ public class AccumulatorVariable {
 		List<Integer> numberList = Arrays.asList(1, 2, 3, 4, 5);
 		JavaRDD<Integer> numbers = sc.parallelize(numberList);
 		
-		numbers.foreach(new VoidFunction<Integer>() {
-			
-			private static final long serialVersionUID = 1L;
+		numbers.foreach(sum::add);
 
-			@Override
-			public void call(Integer t) throws Exception {
-				// 然后在函数内部，就可以对Accumulator变量，调用add()方法，累加值
-				sum.add(t);  
-			}
-			
-		});
-		
 		// 在driver程序中，可以调用Accumulator的value()方法，获取其值
 		System.out.println(sum.value());  
 		

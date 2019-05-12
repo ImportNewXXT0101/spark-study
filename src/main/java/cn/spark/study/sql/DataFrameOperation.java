@@ -15,12 +15,13 @@ public class DataFrameOperation {
 	public static void main(String[] args) {
 		// 创建DataFrame
 		SparkConf conf = new SparkConf()
-				.setAppName("DataFrameCreate");  
+				.setAppName("DataFrameCreate")
+				.setMaster("local");
 		JavaSparkContext sc = new JavaSparkContext(conf);
 		SQLContext sqlContext = new SQLContext(sc);
 		
 		// 创建出来的DataFrame完全可以理解为一张表
-		DataFrame df = sqlContext.read().json("hdfs://spark1:9000/students.json");  
+		DataFrame df = sqlContext.read().json("C://Users//Administrator//Desktop//students.json");
 		
 		// 打印DataFrame中所有的数据（select * from ...）
 		df.show();

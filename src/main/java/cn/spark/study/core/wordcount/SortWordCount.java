@@ -1,4 +1,4 @@
-package cn.spark.study.core;
+package cn.spark.study.core.wordcount;
 
 import java.util.Arrays;
 
@@ -31,17 +31,8 @@ public class SortWordCount {
 		JavaRDD<String> lines = sc.textFile("C://Users//Administrator//Desktop//spark.txt");
 		
 		// 执行我们之前做过的单词计数
-		JavaRDD<String> words = lines.flatMap(new FlatMapFunction<String, String>() {
+		JavaRDD<String> words = lines.flatMap(t->Arrays.asList(t.split(" ")));
 
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public Iterable<String> call(String t) throws Exception {
-				return Arrays.asList(t.split(" "));  
-			}
-			
-		});
-		
 		JavaPairRDD<String, Integer> pairs = words.mapToPair(
 				
 				new PairFunction<String, String, Integer>() {
@@ -74,38 +65,16 @@ public class SortWordCount {
 		// 我们需要将RDD转换成(3, hello) (2, you)的这种格式，才能根据单词出现次数进行排序把！
 		
 		// 进行key-value的反转映射
-		JavaPairRDD<Integer, String> countWords = wordCounts.mapToPair(
-				
-				new PairFunction<Tuple2<String,Integer>, Integer, String>() {
+		JavaPairRDD<Integer, String> countWords =
+				wordCounts.mapToPair(t->new Tuple2<>(t._2, t._1));
 
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public Tuple2<Integer, String> call(Tuple2<String, Integer> t)
-							throws Exception {
-						return new Tuple2<Integer, String>(t._2, t._1);
-					}
-					
-				});
-		
 		// 按照key进行排序
 		JavaPairRDD<Integer, String> sortedCountWords = countWords.sortByKey(false);
 		
 		// 再次将value-key进行反转映射
-		JavaPairRDD<String, Integer> sortedWordCounts = sortedCountWords.mapToPair(
+		JavaPairRDD<String, Integer> sortedWordCounts =
+				sortedCountWords.mapToPair(t->new Tuple2<>(t._2, t._1));
 				
-				new PairFunction<Tuple2<Integer,String>, String, Integer>() {
-
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public Tuple2<String, Integer> call(Tuple2<Integer, String> t)
-							throws Exception {
-						return new Tuple2<String, Integer>(t._2, t._1);
-					}
-					
-				});
-		
 		// 到此为止，我们获得了按照单词出现次数排序后的单词计数
 		// 打印出来
 		sortedWordCounts.foreach(new VoidFunction<Tuple2<String,Integer>>() {

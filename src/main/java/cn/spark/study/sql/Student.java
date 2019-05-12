@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 /**
  * 学生JavaBean
- * @author Administrator
  *
  */
 public class Student implements Serializable {

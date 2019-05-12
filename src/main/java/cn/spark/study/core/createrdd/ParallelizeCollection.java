@@ -16,25 +16,22 @@ import org.apache.spark.api.java.function.Function2;
 public class ParallelizeCollection {
 	
 	public static void main(String[] args) {
-		// 创建SparkConf
+		// 创建JavaSparkContext
 		SparkConf conf = new SparkConf()
 				.setAppName("ParallelizeCollection")
 				.setMaster("local");  
-		
-		// 创建JavaSparkContext
 		JavaSparkContext sc = new JavaSparkContext(conf);
 		
-		// 要通过并行化集合的方式创建RDD，那么就调用SparkContext以及其子类，的parallelize()方法
-		List<Integer> numbers =
-				Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+		// 通过并行化集合的方式创建RDD，
+		// 调用SparkContext以及其子类的parallelize()方法
+		List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6);
 		JavaRDD<Integer> numberRDD = sc.parallelize(numbers);
 		
 		// 执行reduce算子操作
-		// 相当于，先进行1 + 2 = 3；然后再用3 + 3 = 6；然后再用6 + 4 = 10。。。以此类推
 		int sum = numberRDD.reduce((v1,v2)->v1+v2);
 		
 		// 输出累加的和
-		System.out.println("1到10的累加和：->" + sum);
+		System.out.println(numbers+" 累加和：-> " + sum);
 		
 		// 关闭JavaSparkContext
 		sc.close();

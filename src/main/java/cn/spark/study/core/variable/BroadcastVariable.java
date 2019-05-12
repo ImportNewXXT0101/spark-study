@@ -1,4 +1,4 @@
-package cn.spark.study.core;
+package cn.spark.study.core.variable;
 
 import java.util.Arrays;
 import java.util.List;

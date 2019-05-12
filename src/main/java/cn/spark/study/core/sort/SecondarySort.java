@@ -1,4 +1,4 @@
-package cn.spark.study.core;
+package cn.spark.study.core.sort;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
