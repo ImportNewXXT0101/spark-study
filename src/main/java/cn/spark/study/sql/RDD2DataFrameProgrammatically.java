@@ -17,7 +17,6 @@ import org.apache.spark.sql.types.StructField;
 
 /**
  * 以编程方式动态指定元数据，将RDD转换为DataFrame
- * @author Administrator
  *
  */
 public class RDD2DataFrameProgrammatically {
@@ -60,7 +59,7 @@ public class RDD2DataFrameProgrammatically {
 		// 比如说，id、name等，field的名称和类型，可能都是在程序运行过程中，动态从mysql db里
 		// 或者是配置文件中，加载出来的，是不固定的
 		// 所以特别适合用这种编程的方式，来构造元数据
-		List<StructField> structFields = new ArrayList<StructField>();
+		List<StructField> structFields = new ArrayList<>();
 		structFields.add(DataTypes.createStructField("id", DataTypes.IntegerType, true));  
 		structFields.add(DataTypes.createStructField("name", DataTypes.StringType, true));  
 		structFields.add(DataTypes.createStructField("age", DataTypes.IntegerType, true));  

@@ -28,11 +28,11 @@ public class DataFrameOperation {
 		// 查询某列所有的数据
 		df.select("name").show();  
 		// 查询某几列所有的数据，并对列进行计算
-		df.select(df.col("name"), df.col("age").plus(1)).show();
+		df.select(df.col("name"), df.col("score").plus(1)).show();
 		// 根据某一列的值进行过滤
-		df.filter(df.col("age").gt(18)).show();
+		df.filter(df.col("score").gt(80)).show();
 		// 根据某一列进行分组，然后进行聚合
-		df.groupBy(df.col("age")).count().show();
+		df.groupBy(df.col("score")).count().show();
 	}
 	
 }

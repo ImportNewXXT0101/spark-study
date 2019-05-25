@@ -7,21 +7,20 @@ import org.apache.spark.sql.SQLContext;
 
 /**
  * 手动指定数据源类型
- * @author Administrator
  *
  */
 public class ManuallySpecifyOptions {
 
 	public static void main(String[] args) {
 		SparkConf conf = new SparkConf()   
-				.setAppName("ManuallySpecifyOptions");
+				.setAppName("ManuallySpecifyOptions").setMaster("local");
 		JavaSparkContext sc = new JavaSparkContext(conf);
 		SQLContext sqlContext = new SQLContext(sc);
 		
 		DataFrame peopleDF = sqlContext.read().format("json")
-				.load("hdfs://spark1:9000/people.json");
-		peopleDF.select("name").write().format("parquet")  
-				.save("hdfs://spark1:9000/peopleName_java");     
+				.load("C://Users//Administrator//Desktop//students.json");
+		peopleDF.select("name").write().format("json")
+				.save("C://Users//Administrator//Desktop//people.json");
 	}
 	
 }

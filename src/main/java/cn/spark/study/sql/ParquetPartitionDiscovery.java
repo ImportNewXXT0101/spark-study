@@ -7,8 +7,6 @@ import org.apache.spark.sql.SQLContext;
 
 /**
  * Parquet数据源之自动推断分区
- * @author Administrator
- *
  */
 public class ParquetPartitionDiscovery {
 

@@ -21,8 +21,6 @@ import scala.Tuple2;
 
 /**
  * JSON数据源
- * @author Administrator
- *
  */
 public class JSONDataSource {
 

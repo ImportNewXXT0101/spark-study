@@ -13,11 +13,13 @@ public class DataFrameCreate {
 
 	public static void main(String[] args) {
 		SparkConf conf = new SparkConf()
-				.setAppName("DataFrameCreate");  
+				.setAppName("DataFrameCreate")
+				.setMaster("local");
+
 		JavaSparkContext sc = new JavaSparkContext(conf);
 		SQLContext sqlContext = new SQLContext(sc);
 		
-		DataFrame df = sqlContext.read().json("hdfs://spark1:9000/students.json");  
+		DataFrame df = sqlContext.read().json("C://Users//Administrator//Desktop//students.json");
 		
 		df.show();  
 	}

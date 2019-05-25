@@ -12,7 +12,6 @@ import org.apache.spark.sql.SQLContext;
 
 /**
  * 使用反射的方式将RDD转换为DataFrame
- * @author Administrator
  *
  */
 public class RDD2DataFrameReflection {
@@ -55,32 +54,24 @@ public class RDD2DataFrameReflection {
 		
 		// 针对students临时表执行SQL语句，查询年龄小于等于18岁的学生，就是teenageer
 		DataFrame teenagerDF = sqlContext.sql("select * from students where age<= 18");  
-		
+
+		teenagerDF.show();
+
 		// 将查询出来的DataFrame，再次转换为RDD
 		JavaRDD<Row> teenagerRDD = teenagerDF.javaRDD();
-		
-		// 将RDD中的数据，进行映射，映射为Student
-		JavaRDD<Student> teenagerStudentRDD = teenagerRDD.map(new Function<Row, Student>() {
 
-			private static final long serialVersionUID = 1L;
+        // 将RDD中的数据，进行映射，映射为Student
+        // 将数据collect回来，打印出来
+        System.out.println("-------------------");
+        JavaRDD<Student> studentJavaRDD = teenagerRDD.map(row ->
+                Student.builder()
+                        .id(row.getInt(1))
+                        .name(row.getString(2))
+                        .age(row.getInt(0))
+                        .build());
+        studentJavaRDD.collect().forEach(System.out::println);
+        System.out.println("-------------------");
 
-			@Override
-			public Student call(Row row) throws Exception {
-				// row中的数据的顺序，可能是跟我们期望的是不一样的！
-				Student stu = new Student();
-				stu.setAge(row.getInt(0));
-				stu.setId(row.getInt(1));
-				stu.setName(row.getString(2));
-				return stu;
-			}
-			
-		});
-		
-		// 将数据collect回来，打印出来
-		List<Student> studentList = teenagerStudentRDD.collect();
-		for(Student stu : studentList) {
-			System.out.println(stu);  
-		}
 	}
 	
 }

@@ -11,20 +11,20 @@ import org.apache.spark.sql.SQLContext;
 
 /**
  * Parquet数据源之使用编程方式加载数据
- * @author Administrator
  *
  */
 public class ParquetLoadData {
 
 	public static void main(String[] args) {
 		SparkConf conf = new SparkConf()
-				.setAppName("ParquetLoadData");  
+				.setAppName("ParquetLoadData")
+				.setMaster("local");
 		JavaSparkContext sc = new JavaSparkContext(conf);
 		SQLContext sqlContext = new SQLContext(sc);
 		
 		// 读取Parquet文件中的数据，创建一个DataFrame
 		DataFrame usersDF = sqlContext.read().parquet(
-				"hdfs://spark1:9000/spark-study/users.parquet");
+				"C://Users//Administrator//Desktop//users.parquet");
 		
 		// 将DataFrame注册为临时表，然后使用SQL查询需要的数据
 		usersDF.registerTempTable("users");  

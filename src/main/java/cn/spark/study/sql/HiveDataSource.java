@@ -8,8 +8,6 @@ import org.apache.spark.sql.hive.HiveContext;
 
 /**
  * Hive数据源
- * @author Administrator
- *
  */
 public class HiveDataSource {
 
